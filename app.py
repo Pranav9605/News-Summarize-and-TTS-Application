@@ -1,10 +1,9 @@
-# app.py
 import streamlit as st
 import pandas as pd
 import json
 import requests
 
-# Set the base URL for your FastAPI backend (as deployed at Hugging Face Spaces)
+# Set the base URL for your FastAPI backend
 BACKEND_URL = "https://pranav9605-test2.hf.space"
 
 def fetch_company_news(company_name: str):
@@ -43,6 +42,7 @@ def main():
     st.title("News Summarization and Sentiment Analysis")
     st.write("Enter a company name to get news, sentiment analysis, and an audio summary in Hindi.")
     
+    # Company input options
     company_options = ["Zomato", "Swiggy", "Bigbasket", "Tesla", "Tata", "Reliance", "Infosys", "TCS"]
     company_name = st.selectbox("Select a company", company_options)
     custom_company = st.text_input("Or enter a custom company name")
