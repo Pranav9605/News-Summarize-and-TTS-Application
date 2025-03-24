@@ -24,11 +24,6 @@ def fetch_company_news(company_name: str):
         return f"Error: {str(e)}"
 
 def get_text_to_speech(text: str, lang: str = "hi"):
-    """
-    Calls the backend /api/tts endpoint to convert text to speech.
-    If the returned value is a URL (starting with http), it returns that URL.
-    Otherwise, if it's a local file path, it attempts to open and read the file's binary data.
-    """
     url = f"{BACKEND_URL}/api/tts"
     params = {"text": text, "lang": lang}
     try:
@@ -39,25 +34,17 @@ def get_text_to_speech(text: str, lang: str = "hi"):
             st.error("TTS conversion failed: " + data.get("detail", "Unknown error"))
             return None
         audio_file = data.get("audio_file")
-        st.write(f"DEBUG: Received audio file info: {audio_file}")  # Debug output
-
-        # If audio_file is a URL, return it directly.
-        if isinstance(audio_file, str) and audio_file.startswith("http"):
-            return audio_file
-        
-        # Otherwise, assume it's a local file path; try to read the binary data.
-        if isinstance(audio_file, str):
-            try:
-                with open(audio_file, "rb") as f:
-                    audio_bytes = f.read()
-                return audio_bytes
-            except Exception as e:
-                st.error(f"Error reading local audio file: {e}")
-                return None
-        return None
+        st.write(f"DEBUG: Received audio file info: {audio_file}")
+        # If audio_file is a local file path, convert it into a URL by calling the new endpoint
+        if audio_file.startswith("/"):
+            # Assume the backend serves the file via /api/serve_audio?file_path=<file_path>:
+            audio_url = f"{BACKEND_URL}/api/serve_audio?file_path={audio_file}"
+            return audio_url
+        return audio_file
     except Exception as e:
         st.error(f"TTS request error: {e}")
         return None
+
 
 def main():
     st.title("News Summarization and Sentiment Analysis")
